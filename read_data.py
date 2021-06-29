@@ -6,13 +6,16 @@ import bagpy
 #%%
 def read_bag(path):
     df=pd.DataFrame()
+    num=int(os.path.basename(path))
     for f in os.listdir(path):
         if f[-4:]=='.bag':
             bag=bagpy.bagreader(os.path.join(path,f))
-        elif f.split('_')[0]=='succeeded':
-            label=[1,0]
-        elif f.split('_')[0]=='failed':
-            label=[0,1]
+        elif num<21:#No Noise
+            label=[1,0,0]
+        elif num<41:#Scan Noise
+            label=[0,1,0]
+        elif num<61:#Odom Noise
+            label=[0,0,1]
     odom=bag.odometry_data()
     scan=bag.message_by_topic("/scan")
     #Opens as Dataframes

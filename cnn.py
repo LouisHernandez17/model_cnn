@@ -6,36 +6,46 @@ import math
 import random
 # %%
 class Turtlebot_CNN(tf.keras.Model):
-    def __init__(self):
+    def __init__(self,type="cnn"):
         super(Turtlebot_CNN,self).__init__()
         self.input_od=tf.keras.layers.InputLayer(input_shape=(None,None,9))
         self.input_sc=tf.keras.layers.InputLayer(input_shape=(None,None,360))
-        self.conv1_Od=tf.keras.layers.Conv1D(filters=64,kernel_size=10,activation=tf.nn.relu)
-        self.conv2_Od=tf.keras.layers.Conv1D(filters=32,kernel_size=10,activation=tf.nn.relu)
-        self.conv1_Sc=tf.keras.layers.Conv1D(filters=128,kernel_size=25,activation=tf.nn.relu)
-        self.conv2_Sc=tf.keras.layers.Conv1D(filters=64,kernel_size=10,activation=tf.nn.relu)
-        self.conv3_Sc=tf.keras.layers.Conv1D(filters=32,kernel_size=10,activation=tf.nn.relu)
+        self.type=type
+        if type=="cnn":
+            self.Od1=tf.keras.layers.Conv1D(filters=64,kernel_size=10,activation=tf.nn.relu)
+            self.Od2=tf.keras.layers.Conv1D(filters=32,kernel_size=10,activation=tf.nn.relu)
+            self.Sc1=tf.keras.layers.Conv1D(filters=128,kernel_size=25,activation=tf.nn.relu)
+            self.Sc2=tf.keras.layers.Conv1D(filters=64,kernel_size=10,activation=tf.nn.relu)
+            self.Sc3=tf.keras.layers.Conv1D(filters=32,kernel_size=10,activation=tf.nn.relu)
+        elif type=="lstm":
+            self.Od1=tf.keras.layers.LSTM(64,return_sequences=True)
+            self.Od2=tf.keras.layers.LSTM(32)
+            self.Sc1=tf.keras.layers.LSTM(128,return_sequences=True)
+            self.Sc2=tf.keras.layers.LSTM(64,return_sequences=True)
+            self.Sc3=tf.keras.layers.LSTM(32)
+
         self.avg_pool_od=tf.keras.layers.GlobalAveragePooling1D()
         self.avg_pool_sc=tf.keras.layers.GlobalAveragePooling1D()
         self.concat=tf.keras.layers.Concatenate()
         self.dense1=tf.keras.layers.Dense(64,activation=tf.nn.relu)
-        self.dense2=tf.keras.layers.Dense(2 ,activation=tf.nn.softmax)
+        self.dense2=tf.keras.layers.Dense(3,activation=tf.nn.softmax)
     def call(self,inputs):
         x1=inputs[0]
         x2=inputs[1]
         x1=self.input_od(x1)
-        x1=self.conv1_Od(x1)
-        x1=self.conv2_Od(x1)
-        x1=self.avg_pool_od(x1)
+        x1=self.Od1(x1)
+        x1=self.Od2(x1)
         x2=self.input_sc(x2)
-        x2=self.conv1_Sc(x2)
-        x2=self.conv2_Sc(x2)
-        x2=self.conv3_Sc(x2)
-        x2=self.avg_pool_sc(x2)
+        x2=self.Sc1(x2)
+        x2=self.Sc2(x2)
+        x2=self.Sc3(x2)
+        if self.type=='cnn':
+            x2=self.avg_pool_sc(x2)
+            x1=self.avg_pool_od(x1)
         x=self.concat([x1,x2])
         x=self.dense1(x)
-        print(x)
         return(self.dense2(x))
+    
 # %%
 class Sequence_1by1(tf.keras.utils.Sequence):
     def __init__(self,x,y):
