@@ -28,7 +28,8 @@ class Turtlebot_CNN(tf.keras.Model):
         self.avg_pool_sc=tf.keras.layers.GlobalAveragePooling1D()
         self.concat=tf.keras.layers.Concatenate()
         self.dense1=tf.keras.layers.Dense(64,activation=tf.nn.relu)
-        self.dense2=tf.keras.layers.Dense(3,activation=tf.nn.softmax)
+        self.dense2=tf.keras.layers.Dense(128,activation=tf.nn.relu)
+        self.dense3=tf.keras.layers.Dense(3,activation=tf.nn.softmax)
     def call(self,inputs):
         x1=inputs[0]
         x2=inputs[1]
@@ -44,7 +45,8 @@ class Turtlebot_CNN(tf.keras.Model):
             x1=self.avg_pool_od(x1)
         x=self.concat([x1,x2])
         x=self.dense1(x)
-        return(self.dense2(x))
+        x=self.dense2(x)
+        return(self.dense3(x))
     
 # %%
 class Sequence_1by1(tf.keras.utils.Sequence):
