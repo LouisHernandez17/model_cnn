@@ -36,8 +36,9 @@ def make_dataset(path):
             label=[0,0,1]
         for folder_data in os.listdir(os.path.join(path,folder_class)):
             df_od,df_sc=read_bag(os.path.join(path,folder_class,folder_data))
-            odoms.append(df_od.values)
-            scans.append(df_sc.values)
-            labels.append(label)
+            if len(df_od)>15 and len(df_sc)>15:
+                odoms.append(df_od.values)
+                scans.append(df_sc.values)
+                labels.append(label)
     return(odoms,scans,labels)
 # %%
