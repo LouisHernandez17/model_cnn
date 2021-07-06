@@ -21,4 +21,4 @@ py3rosmsgs == 1.18.1
 
 # data_analysis/cnn.py: 2
 # data_analysis/model_test.ipynb: 5
-tensorflow == 1.14.0
+tensorflow == 2.5.0
