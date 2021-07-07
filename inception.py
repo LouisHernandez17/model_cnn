@@ -10,24 +10,21 @@ class InceptionBlock(tf.keras.Model):
         self.conv_list=[]
         for kernel_size in self.kernel_sizes:
             self.conv_list.append(tf.keras.layers.Conv1D(filters=self.nb_filters,padding='same',kernel_size=kernel_size))
-        self.max_pool=tf.keras.layers.MaxPool1D(pool_size=3,padding='same')
+        self.max_pool=tf.keras.layers.MaxPool1D(pool_size=3,padding='same',strides=1)
         self.conv_short=tf.keras.layers.Conv1D(filters=self.nb_filters,kernel_size=1,padding='same')
         self.concat=tf.keras.layers.Concatenate()
         self.normal=tf.keras.layers.BatchNormalization()
         self.activation=tf.keras.layers.Activation(activation='relu')
         self.output_dim=(len(self.conv_list)+1)*nb_filters
     def call(self,input):
-        print(input.shape)
         x=self.bottlneck(input)
-        print(input.shape)
-        print(x.shape)
         res_list=[]
         for conv in self.conv_list:
-            res_list.append(conv(x))
+            res=conv(x)
+            res_list.append(res)
         short=self.max_pool(input)
-        print(short.shape)
-        res_list.append(self.conv_short(short))
-        print(res_list[-1].shape)
+        res=self.conv_short(short)
+        res_list.append(res)
         out=self.concat(res_list)
         out=self.normal(out)
         return self.activation(out)
@@ -79,7 +76,9 @@ class Inception(tf.keras.Model):
                 self.sc_short_add.append(None)
                 self.sc_short_convs.append(None)
     def call(self,inputs):
-        od_inp,sc_inp=inputs
+        od_input,sc_input=inputs
+        od_inp=od_input.to_tensor()
+        sc_inp=sc_input.to_tensor()
         od=od_inp
         sc=sc_inp
         for i,inc in enumerate(self.inception_od):
