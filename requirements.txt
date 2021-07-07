@@ -4,13 +4,13 @@
 bagpy == 0.4.5
 
 # data_analysis/analysis.ipynb: 5
+# data_analysis/model_test.ipynb: 4
 matplotlib == 3.2.1
 
 # data_analysis/analysis.ipynb: 2
 # data_analysis/cnn.py: 4
-# data_analysis/model_test.ipynb: 10
 # data_analysis/read_data.py: 2
-numpy == 1.20.3
+numpy == 1.19.5
 
 # data_analysis/analysis.ipynb: 3
 # data_analysis/read_data.py: 4
@@ -20,5 +20,7 @@ pandas == 1.2.4
 py3rosmsgs == 1.18.1
 
 # data_analysis/cnn.py: 2
-# data_analysis/model_test.ipynb: 5
+# data_analysis/inception.py: 1
+# data_analysis/model_test.ipynb: 3
+# data_analysis/read_data.py: 6,7
 tensorflow == 2.5.0

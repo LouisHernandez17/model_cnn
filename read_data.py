@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import bagpy
 import tensorflow as tf
+import math
 from tensorflow.python.ops.functional_ops import scan
 #%%
 def read_bag(path):
@@ -46,5 +47,22 @@ def make_dataset(path):
                 labels.append(label)
     odoms=tf.ragged.constant(odoms,ragged_rank=1)
     scans=tf.ragged.constant(scans,ragged_rank=1)
-    return odoms,scans,labels,l
+    odoms_ds=tf.data.Dataset.from_tensor_slices(odoms)
+    scans_ds=tf.data.Dataset.from_tensor_slices(scans)
+    labels_ds=tf.data.Dataset.from_tensor_slices(labels)
+    X=tf.data.Dataset.zip((odoms_ds,scans_ds))
+    ds=tf.data.Dataset.zip((X,labels_ds))
+    return ds,l
 # %%
+def split_data(ds,l,batch_train=10,prop_train_val=0.8,prop_train=0.8):
+    ds=ds.shuffle(l)
+    l_train_val=math.ceil(prop_train_val*l)
+    train_val=ds.take(l_train_val)
+    test=ds.skip(l_train_val)
+    l_train=math.floor(prop_train*l_train_val)
+    train=train_val.take(l_train)
+    validation=train_val.skip(l_train)
+    train=train.batch(batch_train)
+    validation=validation.batch(1)
+    test=test.batch(1)
+    return(train,validation,train)

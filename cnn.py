@@ -53,14 +53,7 @@ class Turtlebot_LSTM(tf.keras.Model):
         return(self.dense3(x))
     
 # %%
-def data_preparation(path):
-    odoms,scans,labels,l=make_dataset(path)
-    odoms_ds=tf.data.Dataset.from_tensor_slices(odoms)
-    scans_ds=tf.data.Dataset.from_tensor_slices(scans)
-    labels_ds=tf.data.Dataset.from_tensor_slices(labels)
-    X=tf.data.Dataset.zip((odoms_ds,scans_ds))
-    ds=tf.data.Dataset.zip((X,labels_ds))
-    return ds,l
+
     
 
 # %%
