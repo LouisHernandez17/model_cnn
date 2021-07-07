@@ -3,6 +3,8 @@ import numpy as np
 import os
 import pandas as pd
 import bagpy
+import tensorflow as tf
+from tensorflow.python.ops.functional_ops import scan
 #%%
 def read_bag(path):
     df=pd.DataFrame()
@@ -27,6 +29,7 @@ def make_dataset(path):
     odoms=[]
     scans=[]
     labels=[]
+    l=0
     for folder_class in os.listdir(path):
         if folder_class=='NoNoise':
             label=[1,0,0]
@@ -37,8 +40,11 @@ def make_dataset(path):
         for folder_data in os.listdir(os.path.join(path,folder_class)):
             df_od,df_sc=read_bag(os.path.join(path,folder_class,folder_data))
             if len(df_od)>15 and len(df_sc)>15:
-                odoms.append(df_od.values)
-                scans.append(df_sc.values)
+                l+=1
+                odoms.append(df_od.values.tolist())
+                scans.append(df_sc.values.tolist())
                 labels.append(label)
-    return(odoms,scans,labels)
+    odoms=tf.ragged.constant(odoms,ragged_rank=1)
+    scans=tf.ragged.constant(scans,ragged_rank=1)
+    return odoms,scans,labels,l
 # %%

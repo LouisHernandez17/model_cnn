@@ -8,7 +8,6 @@ import random
 class Turtlebot_CNN(tf.keras.Model):
     def __init__(self):
         super(Turtlebot_CNN,self).__init__()
-        self.type=type
         self.Od1=tf.keras.layers.Conv1D(filters=64,kernel_size=10,padding="same")
         self.Od2=tf.keras.layers.Conv1D(filters=32,kernel_size=10,padding="same")
         self.Sc1=tf.keras.layers.Conv1D(filters=128,kernel_size=10,padding="same")
@@ -16,12 +15,14 @@ class Turtlebot_CNN(tf.keras.Model):
         self.Sc3=tf.keras.layers.Conv1D(filters=32,kernel_size=10,padding="same")
         self.avg_pool_od=tf.keras.layers.GlobalAveragePooling1D()
         self.avg_pool_sc=tf.keras.layers.GlobalAveragePooling1D()
-        self.concat=tf.keras.layers.Concatenate()
+        self.concat=tf.keras.layers.Concatenate(axis=2)
         self.dense1=tf.keras.layers.Dense(64,activation=tf.nn.relu)
         self.dense2=tf.keras.layers.Dense(128,activation=tf.nn.relu)
         self.dense3=tf.keras.layers.Dense(3,activation=tf.nn.softmax)
     def call(self,inputs):
         x1,x2=inputs
+        x1=x1.to_tensor()
+        x2=x2.to_tensor()
         x1=self.Od1(x1)
         x1=self.Od2(x1)
         x2=self.Sc1(x2)
@@ -29,6 +30,8 @@ class Turtlebot_CNN(tf.keras.Model):
         x2=self.Sc3(x2)
         x2=self.avg_pool_sc(x2)
         x1=self.avg_pool_od(x1)
+        print(x1.shape)
+        print(x2.shape)
         x=self.concat([x1,x2])
         x=self.dense1(x)
         x=self.dense2(x)
@@ -36,7 +39,6 @@ class Turtlebot_CNN(tf.keras.Model):
 class Turtlebot_LSTM(tf.keras.Model):
     def __init__(self):
         super(Turtlebot_LSTM,self).__init__()
-        self.type=type
         self.Od=tf.keras.layers.LSTM(32)
         self.Sc=tf.keras.layers.LSTM(32)
         self.concat=tf.keras.layers.Concatenate()
@@ -54,11 +56,10 @@ class Turtlebot_LSTM(tf.keras.Model):
     
 # %%
 def data_preparation(path):
-    odoms,scans,labels=make_dataset(path)
-    l=len(odoms)
-    odoms_ds=tf.data.Dataset.from_generator(lambda:odoms,tf.float64,output_shapes=(None,13))
-    scans_ds=tf.data.Dataset.from_generator(lambda:scans,tf.float64,output_shapes=(None,360))
-    labels_ds=tf.data.Dataset.from_generator(lambda:labels,tf.float64,output_shapes=(3,))
+    odoms,scans,labels,l=make_dataset(path)
+    odoms_ds=tf.data.Dataset.from_tensor_slices(odoms)
+    scans_ds=tf.data.Dataset.from_tensor_slices(scans)
+    labels_ds=tf.data.Dataset.from_tensor_slices(labels)
     X=tf.data.Dataset.zip((odoms_ds,scans_ds))
     ds=tf.data.Dataset.zip((X,labels_ds))
     return ds,l
