@@ -1,0 +1,1 @@
+{goal_reach_timeout: 120, test_breaking_timeout: 7, verification_timeout: 0.25}

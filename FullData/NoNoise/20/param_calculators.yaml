@@ -1,0 +1,27 @@
+dest_dir: /home/rwu-lh/ARAIG
+folder_bagger_node:
+  blacklist: [compressed]
+  start_offset: 0.5
+  stop_offset: 2
+  whitelist: [odom, scan]
+goal_and_stop_node: {tolerance: 0}
+goal_time_node: {if_log: true}
+param_logger_node:
+  namespaces: [runner, interpreters, calculators]
+  start_offset: 1
+  stop_offset: 0.5
+results_logger_node:
+  logginng_topics: [/data/calc/goal_time]
+  start_offset: 0.5
+  stop_offset: 0.1
+robot_has_stopped_node: {param: 0.0, tolerance: 0.005}
+robot_pose_logger:
+  column_headers: [Time, Seq, Pose.Position.x, Pose.Position.y, Pose.Position.z, Pose.Orientation.x,
+    Pose.Orientation.y, Pose.Orientation.z, Pose.Orientation.w, Roll(deg), Pitch(deg),
+    Yaw(deg)]
+  logged_data_title: robot_pose
+  start_offset: 0.5
+  stop_offset: 0.1
+robot_reached_goal_node: {orientation_tolerance: 10, pose_tolerance: 0.05}
+robot_type: turtlebot3_sim
+test_type: auto_sending_goals

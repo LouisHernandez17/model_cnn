@@ -1,0 +1,2 @@
+Time,Seq,Pose.Position.x,Pose.Position.y,Pose.Position.z,Pose.Orientation.x,Pose.Orientation.y,Pose.Orientation.z,Pose.Orientation.w,Roll(deg),Pitch(deg),Yaw(deg)
+2865056000000,748,1.1540292089838213,-0.864085262178804,0.0,0.0,0.0,-0.8490260284774104,0.5283510224915587,0.0,0.0,-116.21178475629782
