@@ -33,8 +33,6 @@ class InceptionBlock(tf.keras.Model):
 class Inception(tf.keras.Model):
     def __init__(self,depth_od=6,depth_sc=6):
         super(Inception,self).__init__()
-        self.mask_od=tf.keras.layers.Masking(mask_value=0)
-        self.mask_sc=tf.keras.layers.Masking(mask_value=0)
         self.depth_sc=depth_sc
         self.depth_od=depth_od
         self.inception_od=[]
@@ -78,9 +76,7 @@ class Inception(tf.keras.Model):
                 self.sc_short_add.append(None)
                 self.sc_short_convs.append(None)
     def call(self,inputs):
-        od_input,sc_input=inputs
-        od_inp=self.mask_od(od_input.to_tensor(default_value=0))
-        sc_inp=self.mask_sc(sc_input.to_tensor(default_value=0))
+        od_inp,sc_inp=inputs
         od=od_inp
         sc=sc_inp
         for i,inc in enumerate(self.inception_od):
