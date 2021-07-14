@@ -5,13 +5,13 @@ class InceptionBlock(tf.keras.Model):
         super(InceptionBlock, self).__init__()
         self.bottleneck_size = bottleneck_size
         self.nb_filters = nb_filters
-        self.bottlneck=tf.keras.layers.Conv1D(filters=bottleneck_size,kernel_size=1,padding='same')
+        self.bottlneck=tf.keras.layers.Conv1D(filters=bottleneck_size,kernel_size=1,padding='same',use_bias=False)
         self.kernel_sizes=[40,20,10]
         self.conv_list=[]
         for kernel_size in self.kernel_sizes:
-            self.conv_list.append(tf.keras.layers.Conv1D(filters=self.nb_filters,padding='same',kernel_size=kernel_size))
+            self.conv_list.append(tf.keras.layers.Conv1D(filters=self.nb_filters,padding='same',kernel_size=kernel_size,use_bias=False))
         self.max_pool=tf.keras.layers.MaxPool1D(pool_size=3,padding='same',strides=1)
-        self.conv_short=tf.keras.layers.Conv1D(filters=self.nb_filters,kernel_size=1,padding='same')
+        self.conv_short=tf.keras.layers.Conv1D(filters=self.nb_filters,kernel_size=1,padding='same',use_bias=False)
         self.concat=tf.keras.layers.Concatenate()
         self.normal=tf.keras.layers.BatchNormalization()
         self.activation=tf.keras.layers.Activation(activation='relu')
@@ -33,8 +33,8 @@ class InceptionBlock(tf.keras.Model):
 class Inception(tf.keras.Model):
     def __init__(self,depth_od=6,depth_sc=6):
         super(Inception,self).__init__()
-        self.mask_od=tf.keras.layers.Masking()
-        self.mask_sc=tf.keras.layers.Masking()
+        self.mask_od=tf.keras.layers.Masking(mask_value=0)
+        self.mask_sc=tf.keras.layers.Masking(mask_value=0)
         self.depth_sc=depth_sc
         self.depth_od=depth_od
         self.inception_od=[]
@@ -53,7 +53,7 @@ class Inception(tf.keras.Model):
         self.od_short_act=[]
         for i in range(self.depth_od):
             if i%3==2:
-                self.od_short_convs.append(tf.keras.layers.Conv1D(filters=self.inception_od[i].output_dim,kernel_size=1,padding='same'))
+                self.od_short_convs.append(tf.keras.layers.Conv1D(filters=self.inception_od[i].output_dim,kernel_size=1,padding='same',use_bias=False))
                 self.od_short_act.append(tf.keras.layers.Activation('relu'))
                 self.od_short_add.append(tf.keras.layers.Add())
                 self.od_short_norm.append(tf.keras.layers.BatchNormalization())
@@ -68,7 +68,7 @@ class Inception(tf.keras.Model):
         self.sc_short_act=[]
         for i in range(self.depth_sc):
             if i%3==2:
-                self.sc_short_convs.append(tf.keras.layers.Conv1D(filters=self.inception_sc[i].output_dim,kernel_size=1,padding='same'))
+                self.sc_short_convs.append(tf.keras.layers.Conv1D(filters=self.inception_sc[i].output_dim,kernel_size=1,padding='same',use_bias=False))
                 self.sc_short_act.append(tf.keras.layers.Activation('relu'))
                 self.sc_short_add.append(tf.keras.layers.Add())
                 self.sc_short_norm.append(tf.keras.layers.BatchNormalization())
@@ -79,8 +79,8 @@ class Inception(tf.keras.Model):
                 self.sc_short_convs.append(None)
     def call(self,inputs):
         od_input,sc_input=inputs
-        od_inp=self.mask_od(od_input.to_tensor())
-        sc_inp=self.mask_sc(sc_input.to_tensor())
+        od_inp=self.mask_od(od_input.to_tensor(default_value=0))
+        sc_inp=self.mask_sc(sc_input.to_tensor(default_value=0))
         od=od_inp
         sc=sc_inp
         for i,inc in enumerate(self.inception_od):
