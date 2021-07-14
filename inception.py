@@ -44,7 +44,9 @@ class Inception(tf.keras.Model):
         self.avg_pool_od=tf.keras.layers.GlobalAveragePooling1D()
         self.avg_pool_sc=tf.keras.layers.GlobalAveragePooling1D()
         self.concat=tf.keras.layers.Concatenate()
-        self.dense=tf.keras.layers.Dense(3,activation=tf.nn.softmax)
+        self.dense1=tf.keras.layers.Dense(64,activation=tf.nn.relu)
+        self.dense2=tf.keras.layers.Dense(128,activation=tf.nn.relu)
+        self.dense3=tf.keras.layers.Dense(3,activation=tf.nn.softmax)
         self.od_short_convs=[]
         self.od_short_norm=[]
         self.od_short_add=[]
@@ -106,6 +108,8 @@ class Inception(tf.keras.Model):
         od=self.avg_pool_od(od)
         sc=self.avg_pool_sc(sc)
         x=self.concat([od,sc])
-        return self.dense(x)
+        x=self.dense1(x)
+        x=self.dense2(x)
+        return(self.dense3(x))
         
 
