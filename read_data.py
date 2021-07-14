@@ -36,13 +36,15 @@ def make_dataset(path,with_label=True):
                 label=[0 for i in range(len(labels_name))]
                 if folder_class==lab_name:
                     label[i]=1
-                for folder_data in os.listdir(os.path.join(path,folder_class)):
-                    df_od,df_sc=read_bag(os.path.join(path,folder_class,folder_data))
-                    if len(df_od)>15 and len(df_sc)>15:
-                        l+=1
-                        odoms.append(df_od.values.tolist())
-                        scans.append(df_sc.values.tolist())
-                        labels.append(label)
+                    for folder_data in os.listdir(os.path.join(path,folder_class)):
+                        df_od,df_sc=read_bag(os.path.join(path,folder_class,folder_data))
+                        if len(df_od)>15 and len(df_sc)>15:
+                            l+=1
+                            odoms.append(df_od.values.tolist())
+                            scans.append(df_sc.values.tolist())
+                            labels.append(label)
+                else:
+                    ()
         odoms=tf.ragged.constant(odoms,ragged_rank=1)
         scans=tf.ragged.constant(scans,ragged_rank=1)
         odoms_ds=tf.data.Dataset.from_tensor_slices(odoms)
