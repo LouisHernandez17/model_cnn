@@ -78,7 +78,8 @@ class Inception(tf.keras.Model):
                 self.sc_short_add.append(None)
                 self.sc_short_convs.append(None)
     def call(self,inputs):
-        od_inp,sc_inp=inputs
+        od_input,sc_input=inputs
+        od_inp,sc_inp=od_input.to_tensor(),sc_input.to_tensor()
         od=od_inp
         sc=sc_inp
         for i,inc in enumerate(self.inception_od):
@@ -111,5 +112,6 @@ class Inception(tf.keras.Model):
         x=self.dense1(x)
         x=self.dense2(x)
         return(self.dense3(x))
+        return self.dense(x)
         
 

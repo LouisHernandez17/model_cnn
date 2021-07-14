@@ -17,6 +17,7 @@ class Turtlebot_CNN(tf.keras.Model):
         self.dense3=tf.keras.layers.Dense(3,activation=tf.nn.softmax)
     def call(self,inputs):
         x1,x2=inputs
+        x1,x2=x1.to_tensor(),x2.to_tensor()
         x1=self.Od1(x1)
         x1=self.Od2(x1)
         x2=self.Sc1(x2)
