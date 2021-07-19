@@ -101,3 +101,10 @@ def split_data(ds,l,batch_train=10,prop_train_val=0.8,prop_train=0.8):
     test=test.batch(1)
     return(train,validation,train)
 #%%
+def pred2str(pred):
+    labels_name=['NoNoise','OdomNoise','ScanNoise']
+    pred=np.array(pred).reshape((3,))
+    return labels_name[pred.argmax]
+def predict(model,data):
+    for i in data:
+        print(pred2str(model.predict(data)))

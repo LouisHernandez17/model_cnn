@@ -10,6 +10,7 @@ class Turtlebot_LSTM(tf.keras.Model):
         self.dense1=tf.keras.layers.Dense(64,activation=tf.nn.relu)
         self.dense2=tf.keras.layers.Dense(128,activation=tf.nn.relu)
         self.dense3=tf.keras.layers.Dense(3,activation=tf.nn.softmax)
+        self.short_name='lstm'
     def call(self,inputs):
         x1,x2=inputs
         x1=self.Od(x1)

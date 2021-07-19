@@ -4,6 +4,7 @@ import tensorflow as tf
 class Turtlebot_CNN(tf.keras.Model):
     def __init__(self):
         super(Turtlebot_CNN,self).__init__()
+        self.short_name='cnn'
         self.Od1=tf.keras.layers.Conv1D(filters=64,kernel_size=10,padding="same",use_bias=False)
         self.Od2=tf.keras.layers.Conv1D(filters=32,kernel_size=10,padding="same",use_bias=False)
         self.Sc1=tf.keras.layers.Conv1D(filters=128,kernel_size=10,padding="same",use_bias=False)

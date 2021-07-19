@@ -33,6 +33,7 @@ class InceptionBlock(tf.keras.Model):
 class Inception(tf.keras.Model):
     def __init__(self,depth_od=6,depth_sc=6):
         super(Inception,self).__init__()
+        self.short_name='inc'
         self.depth_sc=depth_sc
         self.depth_od=depth_od
         self.inception_od=[]
@@ -79,6 +80,7 @@ class Inception(tf.keras.Model):
                 self.sc_short_convs.append(None)
     def call(self,inputs):
         od_input,sc_input=inputs
+        
         od_inp,sc_inp=od_input.to_tensor(),sc_input.to_tensor()
         od=od_inp
         sc=sc_inp

@@ -1,2 +1,0 @@
-model_checkpoint_path: "checkpoint_lstm_batch1_epochs10"
-all_model_checkpoint_paths: "checkpoint_lstm_batch1_epochs10"
