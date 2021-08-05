@@ -31,89 +31,56 @@ class InceptionBlock(tf.keras.Model):
 
 
 class Inception(tf.keras.Model):
-    def __init__(self,depth_od=6,depth_sc=6):
+    def __init__(self,depth=6,n_branches=2):
         super(Inception,self).__init__()
         self.short_name='inc'
-        self.depth_sc=depth_sc
-        self.depth_od=depth_od
-        self.inception_od=[]
-        self.inception_sc=[]
-        for d in range(depth_od):
-            self.inception_od.append(InceptionBlock())
-        for d in range(depth_sc):
-            self.inception_sc.append(InceptionBlock())
-        self.avg_pool_od=tf.keras.layers.GlobalAveragePooling1D()
-        self.avg_pool_sc=tf.keras.layers.GlobalAveragePooling1D()
+        self.n_branches=n_branches
+        self.depth=depth
+        self.inceptions=[[] for i in range(n_branches)]
+        for inception in self.inceptions:
+            for d in range(depth):
+                inception.append(InceptionBlock())
+        self.avg_pools=[tf.keras.layers.GlobalAveragePooling1D() for i in range(n_branches)]
         self.concat=tf.keras.layers.Concatenate()
         self.dense1=tf.keras.layers.Dense(64,activation=tf.nn.relu)
         self.dense2=tf.keras.layers.Dense(128,activation=tf.nn.relu)
         self.dense3=tf.keras.layers.Dense(3,activation=tf.nn.softmax)
-        self.od_short_convs=[]
-        self.od_short_norm=[]
-        self.od_short_add=[]
-        self.od_short_act=[]
-        for i in range(self.depth_od):
-            if i%3==2:
-                self.od_short_convs.append(tf.keras.layers.Conv1D(filters=self.inception_od[i].output_dim,kernel_size=1,padding='same',use_bias=False))
-                self.od_short_act.append(tf.keras.layers.Activation('relu'))
-                self.od_short_add.append(tf.keras.layers.Add())
-                self.od_short_norm.append(tf.keras.layers.BatchNormalization())
-            else:
-                self.od_short_norm.append(None)
-                self.od_short_act.append(None)
-                self.od_short_add.append(None)
-                self.od_short_convs.append(None)
-        self.sc_short_convs=[]
-        self.sc_short_norm=[]
-        self.sc_short_add=[]
-        self.sc_short_act=[]
-        for i in range(self.depth_sc):
-            if i%3==2:
-                self.sc_short_convs.append(tf.keras.layers.Conv1D(filters=self.inception_sc[i].output_dim,kernel_size=1,padding='same',use_bias=False))
-                self.sc_short_act.append(tf.keras.layers.Activation('relu'))
-                self.sc_short_add.append(tf.keras.layers.Add())
-                self.sc_short_norm.append(tf.keras.layers.BatchNormalization())
-            else:
-                self.sc_short_norm.append(None)
-                self.sc_short_act.append(None)
-                self.sc_short_add.append(None)
-                self.sc_short_convs.append(None)
+        self.short_convs=[[] for i in range(n_branches)]
+        self.short_norm=[[] for i in range(n_branches)]
+        self.short_add=[[] for i in range(n_branches)]
+        self.short_act=[[] for i in range(n_branches)]
+        for k in range(n_branches):
+            for i in range(self.depth):
+                if i%3==2:
+                    self.short_convs[k].append(tf.keras.layers.Conv1D(filters=self.inceptions[k][i].output_dim,kernel_size=1,padding='same',use_bias=False))
+                    self.short_act[k].append(tf.keras.layers.Activation('relu'))
+                    self.short_add[k].append(tf.keras.layers.Add())
+                    self.short_norm[k].append(tf.keras.layers.BatchNormalization())
+                else:
+                    self.short_norm[k].append(None)
+                    self.short_act[k].append(None)
+                    self.short_add[k].append(None)
+                    self.short_convs[k].append(None)
     def call(self,inputs):
-        od_input,sc_input=inputs
-        
-        od_inp,sc_inp=od_input.to_tensor(),sc_input.to_tensor()
-        od=od_inp
-        sc=sc_inp
-        for i,inc in enumerate(self.inception_od):
-            od=inc(od)
-            if i%3==2:
-                conv=self.od_short_convs[i]
-                norm=self.od_short_norm[i]
-                add=self.od_short_add[i]
-                act=self.od_short_act[i]
-                new_od_inp=conv(od_inp)
-                new_od_inp=norm(new_od_inp)
-                od=add([new_od_inp,od])
-                od=act(od)
-                od_inp=od
-        for i,inc in enumerate(self.inception_sc):
-            sc=inc(sc)
-            if i%3==2:
-                conv=self.sc_short_convs[i]
-                norm=self.sc_short_norm[i]
-                add=self.sc_short_add[i]
-                act=self.sc_short_act[i]
-                new_sc_inp=conv(sc_inp)
-                new_sc_inp=norm(new_sc_inp)
-                sc=add([new_sc_inp,sc])
-                sc=act(sc)
-                sc_inp=sc
-        od=self.avg_pool_od(od)
-        sc=self.avg_pool_sc(sc)
-        x=self.concat([od,sc])
+        xs=[]
+        for k in range(self.n_branches):
+            inp=inputs[k].to_tensor()
+            for i,inc in enumerate(self.inceptions[k]):
+                x=inc(inp)
+                if i%3==2:
+                    conv=self.short_convs[k][i]
+                    norm=self.short_norm[k][i]
+                    add=self.short_add[k][i]
+                    act=self.short_act[k][i]
+                    new_inp=conv(inp)
+                    new_inp=norm(new_inp)
+                    x=add([new_inp,x])
+                    x=act(x)
+                    inp=x
+            xs.append(self.avg_pools[k](x))
+        x=self.concat(xs)
         x=self.dense1(x)
         x=self.dense2(x)
         return(self.dense3(x))
-        return self.dense(x)
         
 
