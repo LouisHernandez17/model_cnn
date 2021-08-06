@@ -23,7 +23,7 @@ def trainings(model,batch_sizes,num_epochs,ds,l,on_top=True):
             model=model()
         print('Training {} Using batch size {}'.format(model.short_name,batch_size))
         train,validation,test=split_data(ds,l,batch_train=batch_size)
-        cb=[tf.keras.callbacks.ModelCheckpoint('{}_model/checkpoint_batch{}_epochs{}.h5'.format(model.short_name,batch_size,num_epochs),monitor='val_loss',save_weight_only=True,save_best_only=True),tf.keras.callbacks.EarlyStopping(monitor='val_loss',patience=100)]
+        cb=[tf.keras.callbacks.EarlyStopping(monitor='val_loss',patience=100)]#tf.keras.callbacks.ModelCheckpoint('{}_model/checkpoint_batch{}_epochs{}.h5'.format(model.short_name,batch_size,num_epochs),monitor='val_loss',save_weight_only=True,save_best_only=True)
         model.compile(optimizer='adam',loss='categorical_crossentropy',metrics=[tf.keras.metrics.CategoricalAccuracy()])
         histories.append(model.fit(train,epochs=num_epochs,callbacks=cb,verbose=1,validation_data=validation).history)
         model.load_weights('{}_model/checkpoint_batch{}_epochs{}.h5'.format(model.short_name,batch_size,num_epochs))

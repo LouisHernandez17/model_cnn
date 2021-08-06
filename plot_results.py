@@ -1,4 +1,5 @@
 #%%
+
 import matplotlib.pyplot as plt
 import json
 names=['cnn','lstm','inc']
@@ -13,6 +14,7 @@ for i,path in enumerate(paths):
     y=[]
     plt.figure()
     plt.title('Learning curve for {} model'.format(names[i]))
+    plt.ylim([-0.05,1.05])
     for j,history in enumerate(data['History']):
         x2+=len(history['loss'])
         y+=history['loss']
@@ -22,7 +24,8 @@ for i,path in enumerate(paths):
     plt.legend()
     plt.show()
     plt.figure()
-    plt.plot(data['Batch Sizes'],data['Scores'])
+    plt.plot(data['Batch sizes'],data['Scores'])
+    plt.legend(('Loss','Accuracy'))
     plt.xlabel('Batch size')
     plt.title('Score on test dataset for each batch size')
 # %%

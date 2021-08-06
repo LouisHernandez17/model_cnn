@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from read_data import read_bag
 import matplotlib.pyplot as plt
-
+#%%
 labels_name =["NoNoise",'OdomNoise','ScanNoise']
 path="FullData"
 colors=['r','g','b']
