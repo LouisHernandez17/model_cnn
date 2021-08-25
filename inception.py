@@ -1,6 +1,7 @@
+#%%
 import tensorflow as tf
 
-#%%
+
 def InceptionBlock(input,bottleneck_size=32,nb_filters=32):
     bottleneck=tf.keras.layers.Conv1D(filters=bottleneck_size,kernel_size=1,padding='same',use_bias=False)
     x=bottleneck(input)
@@ -29,7 +30,7 @@ def InceptionBranch(input,depth=6):
             x=tf.keras.layers.Add()([x,new_inp])
             x=tf.keras.layers.Activation(activation='relu')(x)
             inp=x
-    x=tf.keras.layers.GlobalAveragePooling1D()(x)
+    x=tf.keras.layers.GlobalMaxPool1D()(x)
     return(x)
 def Inception(dims=[13,360]):
     Inputs=[tf.keras.Input(shape=(None,dim),ragged=True) for dim in dims]
@@ -40,3 +41,5 @@ def Inception(dims=[13,360]):
     dense1=tf.keras.layers.Dense(64,activation=tf.nn.relu)(concat)
     dense2=tf.keras.layers.Dense(3,activation=tf.nn.softmax)(dense1)
     return(tf.keras.Model(Inputs,dense2,name='inc'))
+
+# %%

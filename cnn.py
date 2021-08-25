@@ -10,7 +10,7 @@ def CNN_branch(input):
     x=tf.keras.layers.Conv1D(filters=64,kernel_size=15,padding="same")(x)
     x=tf.keras.layers.Conv1D(filters=32,kernel_size=10,padding="same")(x)
     x=tf.keras.layers.Conv1D(filters=16,kernel_size=5,padding="same")(x)
-    x=tf.keras.layers.GlobalAveragePooling1D()(x)
+    x=tf.keras.layers.GlobalMaxPool1D()(x)
     return x
 
 def Turtlebot_CNN(dims=[13,360]):

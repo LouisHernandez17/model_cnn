@@ -57,7 +57,8 @@ batch_sizes=[1,10,20,30]
 num_epochs=200
 results={}
 ds,l=make_dataset(path='FullData/')
-models=[Turtlebot_CNN,Inception,Turtlebot_LSTM]#Models fed to the function are not instancied
+models=[Turtlebot_CNN
+,Inception]#,Turtlebot_LSTM]#Models fed to the function are not instancied
 for mod in models:
     name=mod().name
     if name=='lstm':
