@@ -15,7 +15,7 @@ physical_devices = tf.config.experimental.list_physical_devices('GPU')
 assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
 config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
-model_path="/media/louis/TOSHIBA EXT/models"
+model_path="models/"
 class ThresholdCallback(tf.keras.callbacks.Callback):
     def __init__(self, threshold):
         super(ThresholdCallback, self).__init__()
@@ -57,8 +57,8 @@ batch_sizes=[1,10,20,30]
 num_epochs=200
 results={}
 ds,l=make_dataset(path='FullData/')
-models=[Turtlebot_CNN
-,Inception]#,Turtlebot_LSTM]#Models fed to the function are not instancied
+models=[Turtlebot_CNN]
+#,Inception]#,Turtlebot_LSTM]#Models fed to the function are not instancied
 for mod in models:
     name=mod().name
     if name=='lstm':
