@@ -20,6 +20,7 @@ for model in models:
             batch,epochs=file.split('_')[5:],file.split('_')[2][6:-2]
             model.load_weights(file)
             loss,accuracy=model.evaluate(ds.batch(1))
+            print(loss,accuracy)
         results.loc[file]=[model.short_name,batch,epochs,loss,accuracy]
 results.to_csv('Results.csv')
 # %%

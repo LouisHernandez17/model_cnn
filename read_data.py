@@ -18,9 +18,9 @@ def read_bag(path):
     df_sc=pd.read_csv(scan,index_col='Time')
     #Removes useless columns
     od_cols=[i for i in df_od.columns if i.split('.')[0]=='pose' or i.split('.')[0]=='orientation' or i.split('.')[0]=='linear' or i.split('.')[0]=='angular']
-    df_od=df_od[od_cols].fillna(method="ffill").fillna(value=0)#Fills the NaNs
-    sc_cols=[i for i in df_sc.columns if i.split('_')[0]=='intensities']
-    df_sc=df_sc[sc_cols].fillna(method="ffill").fillna(value=0)
+    df_od=df_od[od_cols].fillna(method="ffill").fillna(value=0).replace(np.inf,10)#Fills the NaNs
+    sc_cols=[i for i in df_sc.columns if i.split('_')[0]=='ranges']
+    df_sc=df_sc[sc_cols].fillna(method="ffill").fillna(value=0).replace(np.inf,10)
     return(df_od,df_sc)
     
 # %%
@@ -33,9 +33,9 @@ def make_dataset(path,with_label=True):
     if with_label:#We read several folders with the foldername indicating the label
         for i,lab_name in enumerate(labels_name):
             for folder_class in os.listdir(path):
-                label=[0 for i in range(len(labels_name))]
+                label=[1e-8 for i in range(len(labels_name))]
                 if folder_class==lab_name:
-                    label[i]=1
+                    label[i]=1-1e-8*(len(labels_name)-1)
                     for folder_data in os.listdir(os.path.join(path,folder_class)):
                         df_od,df_sc=read_bag(os.path.join(path,folder_class,folder_data))
                         if len(df_od)>15 and len(df_sc)>15:
@@ -60,7 +60,7 @@ def make_dataset(path,with_label=True):
                 l+=1
                 odoms.append(df_od.values.tolist())
                 scans.append(df_sc.values.tolist())
-                labels.append([0,0,0])
+                labels.append([1e-8 for i in range(len(labels_name))])
             odoms=tf.ragged.constant(odoms,ragged_rank=1)
             scans=tf.ragged.constant(scans,ragged_rank=1)
             odoms_ds=tf.data.Dataset.from_tensor_slices(odoms)
@@ -76,7 +76,7 @@ def make_dataset(path,with_label=True):
                     l+=1
                     odoms.append(df_od.values.tolist())
                     scans.append(df_sc.values.tolist())
-                    labels.append([0,0,0])
+                    labels.append([1e-8 for i in range(len(labels_name))])
             odoms=tf.ragged.constant(odoms,ragged_rank=1)
             scans=tf.ragged.constant(scans,ragged_rank=1)
             odoms_ds=tf.data.Dataset.from_tensor_slices(odoms)
